@@ -24,8 +24,10 @@
 #include "io_context/io_context.hpp"
 #include "msg_converters/converters.hpp"
 
-using asio::ip::udp;
-using asio::ip::address;
+//using asio::ip::udp;
+using boost::asio::ip::udp;
+//using asio::ip::address;
+using boost::asio::ip::address;
 using drivers::common::IoContext;
 
 namespace drivers
@@ -82,11 +84,13 @@ public:
 
 private:
   void asyncSendHandler(
-    const asio::error_code & error,
+//    const asio::error_code & error,
+    const boost::system::error_code & error,
     std::size_t bytes_transferred);
 
   void asyncReceiveHandler(
-    const asio::error_code & error,
+//    const asio::error_code & error,
+    const boost::system::error_code & error,
     std::size_t bytes_transferred);
 
 private:

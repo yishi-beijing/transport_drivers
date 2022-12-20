@@ -22,7 +22,8 @@
 #include <system_error>
 #include <vector>
 
-#include "asio.hpp"
+//#include "asio.hpp"
+#include "boost/asio.hpp"
 #include "rclcpp/logging.hpp"
 
 namespace drivers
@@ -65,8 +66,10 @@ UdpSocket::~UdpSocket()
 std::size_t UdpSocket::send(std::vector<uint8_t> & buff)
 {
   try {
-    return m_udp_socket.send_to(asio::buffer(buff), m_remote_endpoint);
-  } catch (const std::system_error & error) {
+//    return m_udp_socket.send_to(asio::buffer(buff), m_remote_endpoint);
+    return m_udp_socket.send_to(boost::asio::buffer(buff), m_remote_endpoint);
+//  } catch (const std::system_error & error) {
+  } catch (const boost::system::system_error & error) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("UdpSocket::send"), error.what());
     return -1;
   }
@@ -74,16 +77,20 @@ std::size_t UdpSocket::send(std::vector<uint8_t> & buff)
 
 size_t UdpSocket::receive(std::vector<uint8_t> & buff)
 {
-  asio::error_code error;
-  asio::ip::udp::endpoint sender_endpoint;
+//  asio::error_code error;
+  boost::system::error_code error;
+//  asio::ip::udp::endpoint sender_endpoint;
+  boost::asio::ip::udp::endpoint sender_endpoint;
 
   std::size_t len = m_udp_socket.receive_from(
-    asio::buffer(buff),
+//    asio::buffer(buff),
+    boost::asio::buffer(buff),
     m_host_endpoint,
     0,
     error);
 
-  if (error && error != asio::error::message_size) {
+//  if (error && error != asio::error::message_size) {
+  if (error && error != boost::asio::error::message_size) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("UdpSocket::receive"), error.message());
     return -1;
   }
@@ -93,8 +100,10 @@ size_t UdpSocket::receive(std::vector<uint8_t> & buff)
 void UdpSocket::asyncSend(std::vector<uint8_t> & buff)
 {
   m_udp_socket.async_send_to(
-    asio::buffer(buff), m_remote_endpoint,
-    [this](std::error_code error, std::size_t bytes_transferred)
+//    asio::buffer(buff), m_remote_endpoint,
+    boost::asio::buffer(buff), m_remote_endpoint,
+//    [this](std::error_code error, std::size_t bytes_transferred)
+    [this](boost::system::error_code error, std::size_t bytes_transferred)
     {
       asyncSendHandler(error, bytes_transferred);
     });
@@ -104,16 +113,19 @@ void UdpSocket::asyncReceive(Functor func)
 {
   m_func = std::move(func);
   m_udp_socket.async_receive_from(
-    asio::buffer(m_recv_buffer),
+//    asio::buffer(m_recv_buffer),
+    boost::asio::buffer(m_recv_buffer),
     m_host_endpoint,
-    [this](std::error_code error, std::size_t bytes_transferred)
+//    [this](std::error_code error, std::size_t bytes_transferred)
+    [this](boost::system::error_code error, std::size_t bytes_transferred)
     {
       asyncReceiveHandler(error, bytes_transferred);
     });
 }
 
 void UdpSocket::asyncSendHandler(
-  const asio::error_code & error,
+//  const asio::error_code & error,
+  const boost::system::error_code & error,
   std::size_t bytes_transferred)
 {
   (void)bytes_transferred;
@@ -123,7 +135,8 @@ void UdpSocket::asyncSendHandler(
 }
 
 void UdpSocket::asyncReceiveHandler(
-  const asio::error_code & error,
+//  const asio::error_code & error,
+  const boost::system::error_code & error,
   std::size_t bytes_transferred)
 {
   (void)bytes_transferred;
@@ -137,9 +150,11 @@ void UdpSocket::asyncReceiveHandler(
     m_func(m_recv_buffer);
     m_recv_buffer.resize(m_recv_buffer_size);
     m_udp_socket.async_receive_from(
-      asio::buffer(m_recv_buffer),
+//      asio::buffer(m_recv_buffer),
+      boost::asio::buffer(m_recv_buffer),
       m_host_endpoint,
-      [this](std::error_code error, std::size_t bytes_tf)
+//      [this](std::error_code error, std::size_t bytes_tf)
+      [this](boost::system::error_code error, std::size_t bytes_tf)
       {
         m_recv_buffer.resize(bytes_tf);
         asyncReceiveHandler(error, bytes_tf);
@@ -175,7 +190,8 @@ void UdpSocket::open()
 
 void UdpSocket::close()
 {
-  asio::error_code error;
+//  asio::error_code error;
+  boost::system::error_code error;
   m_udp_socket.close(error);
   if (error) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("UdpSocket::close"), error.message());

@@ -19,7 +19,8 @@
 
 #include "serial_driver/serial_port.hpp"
 
-using spb = asio::serial_port_base;
+//using spb = asio::serial_port_base;
+using spb = boost::asio::serial_port_base;
 using drivers::serial_driver::FlowControl;
 using drivers::serial_driver::Parity;
 using drivers::serial_driver::SerialPort;
@@ -64,8 +65,10 @@ TEST(SerialPortTest, StateTest)
   std::vector<uint8_t> send_recv_buff;
 
   EXPECT_FALSE(port.is_open());
-  EXPECT_THROW(port.send(send_recv_buff), asio::system_error);
-  EXPECT_THROW(port.receive(send_recv_buff), asio::system_error);
+//  EXPECT_THROW(port.send(send_recv_buff), asio::system_error);
+  EXPECT_THROW(port.send(send_recv_buff), boost::system::system_error);
+//  EXPECT_THROW(port.receive(send_recv_buff), asio::system_error);
+  EXPECT_THROW(port.receive(send_recv_buff), boost::system::system_error);
 
   // Can't test other functions without available port
 
@@ -92,7 +95,8 @@ TEST(SerialDriverTest, SendBreakWhenFailtToOpen)
   SerialPort port(ctx, dev_null, config);
 
   EXPECT_FALSE(port.is_open());
-  EXPECT_THROW(port.open(), asio::system_error);
+//  EXPECT_THROW(port.open(), asio::system_error);
+  EXPECT_THROW(port.open(), boost::system::system_error);
   EXPECT_FALSE(port.is_open());
 
   // Without the port open, should return false
