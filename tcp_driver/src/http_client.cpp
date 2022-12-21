@@ -43,9 +43,6 @@ namespace drivers {
               m_resolver(*ctx),
               deadline_(*ctx) {
           m_socket.reset(new tcp::socket(*m_ctx));
-          auto ios = new boost::asio::io_service();
-          auto ms = new tcp::socket(*ios);
-          auto iox = new boost::asio::io_context();
           timeout_msec = 500;
         }
 
