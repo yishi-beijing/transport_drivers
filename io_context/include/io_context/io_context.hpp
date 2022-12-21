@@ -28,6 +28,8 @@ namespace drivers
 namespace common
 {
 
+//using asio = boost::asio;
+
 //! A workaround of boost::thread_group
 // Copied from https://gist.github.com/coin-au-carre/ceb8a790cec3b3535b015be3ec2a1ce2
 struct thread_group
@@ -66,7 +68,7 @@ public:
   IoContext(const IoContext &) = delete;
   IoContext & operator=(const IoContext &) = delete;
 
-  asio::io_service & ios() const;
+  boost::asio::io_service & ios() const;
 
   bool isServiceStopped();
   uint32_t serviceThreadCount();
@@ -80,8 +82,8 @@ public:
   }
 
 private:
-  std::shared_ptr<asio::io_service> m_ios;
-  std::shared_ptr<asio::io_service::work> m_work;
+  std::shared_ptr<boost::asio::io_service> m_ios;
+  std::shared_ptr<boost::asio::io_service::work> m_work;
   std::shared_ptr<drivers::common::thread_group> m_ios_thread_workers;
 };
 

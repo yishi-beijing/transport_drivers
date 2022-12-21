@@ -18,7 +18,8 @@
 
 #include <iostream>
 
-#include "asio.hpp"
+//#include "asio.hpp"
+#include "boost/asio.hpp"
 #include "rclcpp/logging.hpp"
 
 namespace drivers
@@ -30,8 +31,8 @@ IoContext::IoContext()
 : IoContext(std::thread::hardware_concurrency()) {}
 
 IoContext::IoContext(size_t threads_count)
-: m_ios(new asio::io_service()),
-  m_work(new asio::io_service::work(ios())),
+: m_ios(new boost::asio::io_service()),
+  m_work(new boost::asio::io_service::work(ios())),
   m_ios_thread_workers(new drivers::common::thread_group())
 {
   for (size_t i = 0; i < threads_count; ++i) {
@@ -51,7 +52,7 @@ IoContext::~IoContext()
   waitForExit();
 }
 
-asio::io_service & IoContext::ios() const
+boost::asio::io_service & IoContext::ios() const
 {
   return *m_ios;
 }
