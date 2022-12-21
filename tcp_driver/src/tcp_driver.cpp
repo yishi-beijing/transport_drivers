@@ -18,114 +18,98 @@
 #include <string>
 #include <memory>
 
-namespace drivers
-{
-namespace tcp_driver
-{
-TcpDriver::TcpDriver(std::shared_ptr<boost::asio::io_context> ctx)
-: m_ctx(ctx)
-{
-}
+namespace drivers {
+    namespace tcp_driver {
+        TcpDriver::TcpDriver(std::shared_ptr<boost::asio::io_context> ctx)
+            : m_ctx(ctx) {
+        }
 
-TcpDriver::~TcpDriver()
-{
-  close();
-  m_socket.reset();
-}
+        TcpDriver::~TcpDriver() {
+          close();
+          m_socket.reset();
+        }
 
-void TcpDriver::init_socket(const std::string & ip, uint16_t port)
-{
-  m_socket.reset(new TcpSocket(m_ctx, ip, port));
-}
+        void TcpDriver::init_socket(const std::string &ip, uint16_t port) {
+          m_socket.reset(new TcpSocket(m_ctx, ip, port));
+        }
 
-void TcpDriver::init_socket(
-  const std::string & remote_ip, uint16_t remote_port,
-  const std::string & host_ip, uint16_t host_port)
-{
-  m_socket.reset(new TcpSocket(m_ctx, remote_ip, remote_port, host_ip, host_port));
-}
+        void TcpDriver::init_socket(
+            const std::string &remote_ip, uint16_t remote_port,
+            const std::string &host_ip, uint16_t host_port) {
+          m_socket.reset(new TcpSocket(m_ctx, remote_ip, remote_port, host_ip, host_port));
+        }
 
-std::shared_ptr<TcpSocket> TcpDriver::socket() const
-{
-  return m_socket;
-}
+        std::shared_ptr<TcpSocket> TcpDriver::socket() const {
+          return m_socket;
+        }
 
-bool TcpDriver::open()
-{
-  return m_socket->open();
-}
+        bool TcpDriver::open() {
+          return m_socket->open();
+        }
 
-void TcpDriver::close()
-{
-  m_socket->close();
-}
+        void TcpDriver::close() {
+          m_socket->close();
+        }
 
-bool TcpDriver::isOpen() const
-{
-  return m_socket->isOpen();
-}
+        bool TcpDriver::isOpen() const {
+          return m_socket->isOpen();
+        }
 
-bool TcpDriver::asyncSend(std::vector<unsigned char> & buff)
-{
-  if(m_socket->needReset())
-    close();
-  if(!isOpen())
-    if(!open()){
-        std::cerr << "TcpDriver::asyncSend" << ": " << "socket open failed" << "\n";
-      return false;
-    }
-  m_socket->asyncSend(buff);
-  return true;
-}
+        bool TcpDriver::asyncSend(std::vector<unsigned char> &buff) {
+          if (m_socket->needReset())
+            close();
+          if (!isOpen())
+            if (!open()) {
+              std::cerr << "TcpDriver::asyncSend" << ": " << "socket open failed" << "\n";
+              return false;
+            }
+          m_socket->asyncSend(buff);
+          return true;
+        }
 
-bool TcpDriver::asyncSend(std::vector<unsigned char> & buff, std::function<void()> callback)
-{
-  if(m_socket->needReset())
-    close();
-  if(!isOpen())
-    if(!open()){
-        std::cerr << "TcpDriver::asyncSend" << ": " << "socket open failed" << "\n";
-      return false;
-    }
-  m_socket->asyncSend(buff, callback);
-  return true;
-}
+        bool TcpDriver::asyncSend(std::vector<unsigned char> &buff, std::function<void()> callback) {
+          if (m_socket->needReset())
+            close();
+          if (!isOpen())
+            if (!open()) {
+              std::cerr << "TcpDriver::asyncSend" << ": " << "socket open failed" << "\n";
+              return false;
+            }
+          m_socket->asyncSend(buff, callback);
+          return true;
+        }
 
-bool TcpDriver::asyncSendReceiveHeaderPayload(std::vector<unsigned char> & buff, Functor func_header, Functor func_payload, std::function<void ()> func_finally)
-{
-  if(m_socket->needReset())
-    close();
-  if(!isOpen())
-    if(!open()){
-        std::cerr << "TcpDriver::asyncSendReceiveHeaderPayload" << ": " << "socket open failed" << "\n";
-      return false;
-    }
-  m_socket->asyncSendReceiveHeaderPayload(buff, func_header, func_payload, func_finally);
-  return true;
-}
+        bool TcpDriver::asyncSendReceiveHeaderPayload(std::vector<unsigned char> &buff, Functor func_header,
+                                                      Functor func_payload, std::function<void()> func_finally) {
+          if (m_socket->needReset())
+            close();
+          if (!isOpen())
+            if (!open()) {
+              std::cerr << "TcpDriver::asyncSendReceiveHeaderPayload" << ": " << "socket open failed" << "\n";
+              return false;
+            }
+          m_socket->asyncSendReceiveHeaderPayload(buff, func_header, func_payload, func_finally);
+          return true;
+        }
 
-std::vector<uint8_t> TcpDriver::getHeader()
-{
-  return m_socket->getHeader();
-}
+        std::vector<uint8_t> TcpDriver::getHeader() {
+          return m_socket->getHeader();
+        }
 
-std::vector<uint8_t> TcpDriver::getPayload()
-{
-  return m_socket->getPayload();
-}
+        std::vector<uint8_t> TcpDriver::getPayload() {
+          return m_socket->getPayload();
+        }
 
-boost::system::error_code TcpDriver::run()
-{
-  boost::system::error_code ec;
-  m_ctx->run(ec);
-  return ec;
-}
+        boost::system::error_code TcpDriver::run() {
+          boost::system::error_code ec;
+          m_ctx->run(ec);
+          return ec;
+        }
 
-std::shared_ptr<boost::asio::io_context> TcpDriver::GetIOContext()
-{
-  return m_ctx;
-}
+        std::shared_ptr<boost::asio::io_context> TcpDriver::GetIOContext() {
+          return m_ctx;
+        }
 
 
-}  // namespace tcp_driver
+    }  // namespace tcp_driver
 }  // namespace drivers
