@@ -1,4 +1,16 @@
-
+// Copyright 2022 MAP IV, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "tcp_driver/tcp_socket.hpp"
 
@@ -8,8 +20,7 @@
 #include <system_error>
 #include <vector>
 
-//#include "asio.hpp" // Inconvenience occurs with transport_driver's own asio
-#include <boost/asio.hpp> // asio in boost
+#include <boost/asio.hpp>
 #include "rclcpp/logging.hpp"
 
 //#define WITH_DEBUG_STDCOUT_TCP_SOCKET // Use std::cout messages for debugging
@@ -51,9 +62,9 @@ TcpSocket::~TcpSocket()
   m_socket.reset();
 }
 
-/// @brief Get if the socket needs to be reset
-/// @return Whether the socket needs to be reset
-bool TcpSocket::needReset()
+/// @brief Verify whether or not the socket needs to be reset
+/// @return True if the socket state requires a reset.
+bool TcpSocket::needReset() const
 {
   return reset_flg;
 }
