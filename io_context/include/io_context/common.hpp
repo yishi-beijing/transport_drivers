@@ -17,7 +17,6 @@
 #ifndef IO_CONTEXT__COMMON_HPP_
 #define IO_CONTEXT__COMMON_HPP_
 
-//#include <asio.hpp>
-#include <boost/asio.hpp>
+#include <asio.hpp>
 
 #endif  // IO_CONTEXT__COMMON_HPP_
