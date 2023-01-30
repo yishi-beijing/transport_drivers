@@ -21,9 +21,6 @@
 
 #include <boost/asio.hpp>
 
-using boost::asio::ip::tcp;
-using boost::asio::ip::address;
-
 namespace drivers {
     namespace tcp_driver {
 
@@ -287,19 +284,19 @@ namespace drivers {
              * @brief boost::asio::ip::tcp::socket for this driver
              *
              */
-            std::shared_ptr<tcp::socket> m_socket;
+            std::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
 
             /**
              * @brief Device IP address
              *
              */
-            tcp::endpoint m_remote_endpoint;
+            boost::asio::ip::tcp::endpoint m_remote_endpoint;
 
             /**
              * @brief PC IP address
              *
              */
-            tcp::endpoint m_host_endpoint;
+            boost::asio::ip::tcp::endpoint m_host_endpoint;
 
             /**
              * @brief backup message

@@ -21,11 +21,6 @@
 
 #include <boost/beast.hpp>
 
-using boost::asio::ip::tcp;
-
-namespace beast = boost::beast;
-namespace http = beast::http;
-
 namespace drivers {
     namespace tcp_driver {
         /**
@@ -123,7 +118,7 @@ namespace drivers {
              * @param body Body of HTTP request
              * @return std::size_t Length of response data
              */
-            std::size_t write(std::string target, http::verb method, std::string body = "");
+            std::size_t write(std::string target, boost::beast::http::verb method, std::string body = "");
 
             /**
              * @brief Blocking Get Operation
@@ -164,7 +159,7 @@ namespace drivers {
              * @param method Method of HTTP request
              * @param body Body of HTTP request
              */
-            void asyncWrite(Functor func, std::string target, http::verb method, std::string body = "");
+            void asyncWrite(Functor func, std::string target, boost::beast::http::verb method, std::string body = "");
 
             /**
              * @brief NonBlocking Get Operation
@@ -193,8 +188,8 @@ namespace drivers {
              * @param results Resolving results
              */
             void asyncOnResolve(
-                beast::error_code ec,
-                tcp::resolver::results_type results);
+                boost::beast::error_code ec,
+                boost::asio::ip::tcp::resolver::results_type results);
 
             /**
              * @brief Callback for async_connect
@@ -252,26 +247,26 @@ namespace drivers {
              * @brief TCP resolver
              *
              */
-            tcp::resolver m_resolver;
+            boost::asio::ip::tcp::resolver m_resolver;
 
             /**
              * @brief TCP socket for HttpClient
              *
              */
-            std::shared_ptr<tcp::socket> m_socket;
+            std::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
 
             // for async
             /**
              * @brief Http request
              *
              */
-            http::request<http::string_body> m_req;
+            boost::beast::http::request<boost::beast::http::string_body> m_req;
 
             /**
              * @brief Http response
              *
              */
-            http::response<http::string_body> m_res;
+            boost::beast::http::response<boost::beast::http::string_body> m_res;
 
             /**
              * @brief Message buffer

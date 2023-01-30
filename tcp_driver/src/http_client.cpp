@@ -42,7 +42,7 @@ namespace drivers {
               m_ctx(ctx),
               m_resolver(*ctx),
               deadline_(*ctx) {
-          m_socket.reset(new tcp::socket(*m_ctx));
+          m_socket.reset(new boost::asio::ip::tcp::socket(*m_ctx));
           timeout_msec = 500;
         }
 
@@ -57,16 +57,16 @@ namespace drivers {
           close();
         }
 
-        std::size_t HttpClient::write(std::string target, http::verb method, std::string body) {
+        std::size_t HttpClient::write(std::string target, boost::beast::http::verb method, std::string body) {
           try {
 #ifdef WITH_DEBUG_STDCOUT_HTTP_CLIENT
             RCLCPP_INFO(rclcpp::get_logger("HttpClient::write"), "write: %s : %s", target.c_str(), body.c_str());
 #endif
-            http::request<http::string_body> req{method, target, m_http_ver};
-            req.set(http::field::host, m_remote_host);
-            req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-            if (method == http::verb::post) {
-              req.set(beast::http::field::content_type, "application/x-www-form-urlencoded");
+            boost::beast::http::request<boost::beast::http::string_body> req{method, target, m_http_ver};
+            req.set(boost::beast::http::field::host, m_remote_host);
+            req.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+            if (method == boost::beast::http::verb::post) {
+              req.set(boost::beast::http::field::content_type, "application/x-www-form-urlencoded");
               req.body() = body;
 #ifdef WITH_DEBUG_STDCOUT_HTTP_CLIENT
               RCLCPP_INFO(rclcpp::get_logger("HttpClient::write"), "body: %s : %s", body.c_str(), req.body().c_str());
@@ -105,22 +105,22 @@ namespace drivers {
 #ifdef WITH_DEBUG_STDCOUT_HTTP_CLIENT
             RCLCPP_INFO(rclcpp::get_logger("HttpClient::write"), "http::write");
 #endif
-            http::write(*m_socket, req);
-            beast::flat_buffer buffer;
-            http::response<http::dynamic_body> res;
-            http::read(*m_socket, buffer, res);
+            boost::beast::http::write(*m_socket, req);
+            boost::beast::flat_buffer buffer;
+            boost::beast::http::response<boost::beast::http::dynamic_body> res;
+            boost::beast::http::read(*m_socket, buffer, res);
 
             // need to handle the response
 
 #ifdef WITH_DEBUG_STDCOUT_HTTP_CLIENT
             RCLCPP_INFO(rclcpp::get_logger("HttpClient::write"), "m_res.body().data()");
 #endif
-            m_res_string = beast::buffers_to_string(res.body().data());
+            m_res_string = boost::beast::buffers_to_string(res.body().data());
 #ifdef WITH_DEBUG_STDCOUT_HTTP_CLIENT
             RCLCPP_INFO(rclcpp::get_logger("HttpClient::write"), "m_res_string : %s", m_res_string.c_str());
             RCLCPP_INFO(rclcpp::get_logger("HttpClient::write"), "beast::buffers_to_string");
 #endif
-            m_recv_string = beast::buffers_to_string(buffer.data());
+            m_recv_string = boost::beast::buffers_to_string(buffer.data());
 #ifdef WITH_DEBUG_STDCOUT_HTTP_CLIENT
             RCLCPP_INFO(rclcpp::get_logger("HttpClient::write"), "m_recv_string : %s", m_recv_string.c_str());
 #endif
@@ -138,14 +138,14 @@ namespace drivers {
 #ifdef WITH_DEBUG_STDCOUT_HTTP_CLIENT
           RCLCPP_INFO(rclcpp::get_logger("HttpClient::get"), "write: %s", target.c_str());
 #endif
-          return HttpClient::write(target, http::verb::get);
+          return HttpClient::write(target, boost::beast::http::verb::get);
         }
 
         std::size_t HttpClient::post(std::string target, std::string body) {
 #ifdef WITH_DEBUG_STDCOUT_HTTP_CLIENT
           RCLCPP_INFO(rclcpp::get_logger("HttpClient::post"), "write: %s : %s", target.c_str(), body.c_str());
 #endif
-          return HttpClient::write(target, http::verb::post, body);
+          return HttpClient::write(target, boost::beast::http::verb::post, body);
         }
 
         std::string HttpClient::read_result() {
@@ -166,7 +166,7 @@ namespace drivers {
           std::cerr << what << ": " << ec.message() << "\n";
         }
 
-        void HttpClient::asyncWrite(Functor func, std::string target, http::verb method, std::string body) {
+        void HttpClient::asyncWrite(Functor func, std::string target, boost::beast::http::verb method, std::string body) {
           try {
 #ifdef WITH_DEBUG_STDCOUT_HTTP_CLIENT
             std::cout << m_remote_host << std::endl;
@@ -177,10 +177,10 @@ namespace drivers {
             m_req.version(m_http_ver);
             m_req.method(method);
             m_req.target(target);
-            m_req.set(http::field::host, m_remote_host);
-            m_req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-            if (method == http::verb::post) {
-              m_req.set(beast::http::field::content_type, "application/x-www-form-urlencoded");
+            m_req.set(boost::beast::http::field::host, m_remote_host);
+            m_req.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+            if (method == boost::beast::http::verb::post) {
+              m_req.set(boost::beast::http::field::content_type, "application/x-www-form-urlencoded");
               m_req.body() = body;
             }
 
@@ -206,7 +206,7 @@ namespace drivers {
             m_resolver.async_resolve(
                 m_remote_host,
                 std::to_string(m_remote_port),
-                beast::bind_front_handler(
+                boost::beast::bind_front_handler(
                     &HttpClient::asyncOnResolve,
                     shared_from_this()));
 
@@ -236,19 +236,19 @@ namespace drivers {
 #ifdef WITH_DEBUG_STDCOUT_HTTP_CLIENT
           RCLCPP_INFO(rclcpp::get_logger("HttpClient::asyncGet"), "asyncGet: %s", target.c_str());
 #endif
-          return HttpClient::asyncWrite(func, target, http::verb::get);
+          return HttpClient::asyncWrite(func, target, boost::beast::http::verb::get);
         }
 
         void HttpClient::asyncPost(Functor func, std::string target, std::string body) {
 #ifdef WITH_DEBUG_STDCOUT_HTTP_CLIENT
           RCLCPP_INFO(rclcpp::get_logger("HttpClient::asyncPost"), "asyncPost: %s", body.c_str());
 #endif
-          return HttpClient::asyncWrite(func, target, http::verb::post, body);
+          return HttpClient::asyncWrite(func, target, boost::beast::http::verb::post, body);
         }
 
         void HttpClient::asyncOnResolve(
-            beast::error_code ec,
-            tcp::resolver::results_type results) {
+            boost::beast::error_code ec,
+            boost::asio::ip::tcp::resolver::results_type results) {
 #ifdef WITH_DEBUG_STDCOUT_HTTP_CLIENT
           RCLCPP_INFO(rclcpp::get_logger("HttpClient::asyncOnResolve"), "asyncOnResolve");
 #endif
@@ -287,7 +287,7 @@ namespace drivers {
             std::cout << "will http::async_write(*m_socket, m_req," << std::endl;
 #endif
           RCLCPP_INFO(rclcpp::get_logger("HttpClient::asyncOnConnect"), "async_write");
-          http::async_write(*m_socket, m_req,
+          boost::beast::http::async_write(*m_socket, m_req,
                             [this](boost::system::error_code ec, std::size_t bytes_transferred) {
                                 asyncOnWrite(ec, bytes_transferred);
                             });
@@ -314,7 +314,7 @@ namespace drivers {
           RCLCPP_INFO(rclcpp::get_logger("HttpClient::asyncOnWrite"), "async_read");
 #endif
           // Receive the HTTP response
-          http::async_read(*m_socket, m_recv_buffer, m_res,
+          boost::beast::http::async_read(*m_socket, m_recv_buffer, m_res,
                            [this](boost::system::error_code ec, std::size_t bytes_transferred) {
                                asyncOnRead(ec, bytes_transferred);
                            });
@@ -338,10 +338,10 @@ namespace drivers {
 #endif
 
           m_res_string = m_res.body().data();
-          m_recv_string = beast::buffers_to_string(m_recv_buffer.data());
+          m_recv_string = boost::beast::buffers_to_string(m_recv_buffer.data());
 
           // Gracefully close the socket
-          m_socket->shutdown(tcp::socket::shutdown_both, ec);
+          m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 
           // not_connected happens sometimes so don't bother reporting it.
           if (ec && ec != boost::system::errc::not_connected)
@@ -391,11 +391,11 @@ namespace drivers {
           deadline_.cancel();
           if (isOpen()) {
             boost::system::error_code ec;
-            m_socket->shutdown(tcp::socket::shutdown_both, ec);
+            m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
             if (ec && ec != boost::system::errc::not_connected)
               RCLCPP_ERROR_STREAM(rclcpp::get_logger("HttpClient::close"), ec.message());
           }
-          m_socket.reset(new tcp::socket(*m_ctx));
+          m_socket.reset(new boost::asio::ip::tcp::socket(*m_ctx));
         }
 
         bool HttpClient::isOpen() const {

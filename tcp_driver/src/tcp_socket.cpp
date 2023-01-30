@@ -35,15 +35,15 @@ namespace drivers {
             const std::string &host_ip,
             const uint16_t host_port) :
             m_ctx(ctx),
-            m_socket(new tcp::socket(*m_ctx)),
-            m_remote_endpoint(address::from_string(remote_ip), remote_port),
-            m_host_endpoint(address::from_string(host_ip), host_port) {
+            m_socket(new boost::asio::ip::tcp::socket(*m_ctx)),
+            m_remote_endpoint(boost::asio::ip::address::from_string(remote_ip), remote_port),
+            m_host_endpoint(boost::asio::ip::address::from_string(host_ip), host_port) {
           m_remote_endpoint = remote_ip.empty() ?
-                              tcp::endpoint{tcp::v4(), remote_port} :
-                              tcp::endpoint{address::from_string(remote_ip), remote_port};
+                              boost::asio::ip::tcp::endpoint{boost::asio::ip::tcp::v4(), remote_port} :
+                              boost::asio::ip::tcp::endpoint{boost::asio::ip::address::from_string(remote_ip), remote_port};
           m_host_endpoint = host_ip.empty() ?
-                            tcp::endpoint{tcp::v4(), host_port} :
-                            tcp::endpoint{address::from_string(host_ip), host_port};
+                            boost::asio::ip::tcp::endpoint{boost::asio::ip::tcp::v4(), host_port} :
+                            boost::asio::ip::tcp::endpoint{boost::asio::ip::address::from_string(host_ip), host_port};
         }
 
         TcpSocket::TcpSocket(
@@ -382,8 +382,8 @@ namespace drivers {
         }
 
         bool TcpSocket::open() {
-          m_socket->open(tcp::v4());
-          m_socket->set_option(tcp::socket::reuse_address(true));
+          m_socket->open(boost::asio::ip::tcp::v4());
+          m_socket->set_option(boost::asio::ip::tcp::socket::reuse_address(true));
 
           std::cout << m_remote_endpoint << std::endl;
           boost::system::error_code error;
@@ -401,7 +401,7 @@ namespace drivers {
 
         void TcpSocket::close() {
           boost::system::error_code error;
-          m_socket->shutdown(tcp::socket::shutdown_both, error);
+          m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
           if (error && error != boost::system::errc::not_connected) {
             RCLCPP_ERROR_STREAM(rclcpp::get_logger("TcpSocket::shutdown"), error.message());
           }
