@@ -24,7 +24,7 @@ The TCP and HTTP protocols are commonly used by sensors to allow configuration a
 
 The TCP and HTTP classes allow the synchronous and asynchronous reception of packets.
 
-Both wrappers are implemented using the Boost ASIO library.
+Both wrappers are implemented using the Boost.Asio library.
 
 ## Assumptions / Known limits
 
