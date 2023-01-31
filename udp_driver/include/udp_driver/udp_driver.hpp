@@ -32,7 +32,7 @@ namespace udp_driver
 class UdpDriver
 {
 public:
-  explicit UdpDriver(const IoContext & ctx);
+  explicit UdpDriver(const drivers::common::IoContext & ctx);
 
   void init_sender(const std::string & ip, uint16_t port);
   void init_sender(
@@ -44,7 +44,7 @@ public:
   std::shared_ptr<UdpSocket> receiver() const;
 
 private:
-  const IoContext & m_ctx;
+  const drivers::common::IoContext & m_ctx;
   std::shared_ptr<UdpSocket> m_sender;
   std::shared_ptr<UdpSocket> m_receiver;
 };

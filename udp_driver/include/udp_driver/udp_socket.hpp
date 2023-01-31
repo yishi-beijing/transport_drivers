@@ -24,10 +24,6 @@
 #include "io_context/io_context.hpp"
 #include "msg_converters/converters.hpp"
 
-using asio::ip::udp;
-using asio::ip::address;
-using drivers::common::IoContext;
-
 namespace drivers
 {
 namespace udp_driver
@@ -39,11 +35,11 @@ class UdpSocket
 {
 public:
   UdpSocket(
-    const IoContext & ctx,
+    const drivers::common::IoContext & ctx,
     const std::string & remote_ip, uint16_t remote_port,
     const std::string & host_ip, uint16_t host_port);
   UdpSocket(
-    const IoContext & ctx,
+    const drivers::common::IoContext & ctx,
     const std::string & ip, uint16_t port);
   ~UdpSocket();
 
@@ -90,10 +86,10 @@ private:
     std::size_t bytes_transferred);
 
 private:
-  const IoContext & m_ctx;
-  udp::socket m_udp_socket;
-  udp::endpoint m_remote_endpoint;
-  udp::endpoint m_host_endpoint;
+  const drivers::common::IoContext & m_ctx;
+  asio::ip::udp::socket m_udp_socket;
+  asio::ip::udp::endpoint m_remote_endpoint;
+  asio::ip::udp::endpoint m_host_endpoint;
   Functor m_func;
   static const size_t m_recv_buffer_size{2048};
   std::vector<uint8_t> m_recv_buffer;

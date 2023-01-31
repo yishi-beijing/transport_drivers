@@ -49,7 +49,7 @@ public:
   /// \param[in] ctx A shared IoContext
   UdpSenderNode(
     const rclcpp::NodeOptions & options,
-    const IoContext & ctx);
+    const drivers::common::IoContext & ctx);
 
   /// \brief Destructor - required to manage owned IoContext
   ~UdpSenderNode();
@@ -80,7 +80,7 @@ public:
 private:
   void get_params();
 
-  std::unique_ptr<IoContext> m_owned_ctx{};
+  std::unique_ptr<drivers::common::IoContext> m_owned_ctx{};
   std::string m_ip{};
   uint16_t m_port{};
   std::unique_ptr<UdpDriver> m_udp_driver;

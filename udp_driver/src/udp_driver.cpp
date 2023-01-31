@@ -25,7 +25,7 @@ namespace drivers
 namespace udp_driver
 {
 
-UdpDriver::UdpDriver(const IoContext & ctx)
+UdpDriver::UdpDriver(const drivers::common::IoContext & ctx)
 : m_ctx(ctx)
 {
 }

@@ -31,7 +31,7 @@ namespace udp_driver
 
 UdpSenderNode::UdpSenderNode(const rclcpp::NodeOptions & options)
 : lc::LifecycleNode("udp_sender_node", options),
-  m_owned_ctx{new IoContext(1)},
+  m_owned_ctx{new drivers::common::IoContext(1)},
   m_udp_driver{new UdpDriver(*m_owned_ctx)}
 {
   get_params();
@@ -39,7 +39,7 @@ UdpSenderNode::UdpSenderNode(const rclcpp::NodeOptions & options)
 
 UdpSenderNode::UdpSenderNode(
   const rclcpp::NodeOptions & options,
-  const IoContext & ctx)
+  const drivers::common::IoContext & ctx)
 : lc::LifecycleNode("udp_sender_node", options),
   m_udp_driver{new UdpDriver(ctx)}
 {

@@ -31,27 +31,27 @@ namespace udp_driver
 {
 
 UdpSocket::UdpSocket(
-  const IoContext & ctx,
+  const drivers::common::IoContext & ctx,
   const std::string & remote_ip,
   const uint16_t remote_port,
   const std::string & host_ip,
   const uint16_t host_port)
 : m_ctx(ctx),
   m_udp_socket(ctx.ios()),
-  m_remote_endpoint(address::from_string(remote_ip), remote_port),
-  m_host_endpoint(address::from_string(host_ip), host_port)
+  m_remote_endpoint(asio::ip::address::from_string(remote_ip), remote_port),
+  m_host_endpoint(asio::ip::address::from_string(host_ip), host_port)
 {
   m_remote_endpoint = remote_ip.empty() ?
-    udp::endpoint{udp::v4(), remote_port} :
-  udp::endpoint{address::from_string(remote_ip), remote_port};
+    asio::ip::udp::endpoint{asio::ip::udp::v4(), remote_port} :
+  asio::ip::udp::endpoint{asio::ip::address::from_string(remote_ip), remote_port};
   m_host_endpoint = host_ip.empty() ?
-    udp::endpoint{udp::v4(), host_port} :
-  udp::endpoint{address::from_string(host_ip), host_port};
+    asio::ip::udp::endpoint{asio::ip::udp::v4(), host_port} :
+  asio::ip::udp::endpoint{asio::ip::address::from_string(host_ip), host_port};
   m_recv_buffer.resize(m_recv_buffer_size);
 }
 
 UdpSocket::UdpSocket(
-  const IoContext & ctx,
+  const drivers::common::IoContext & ctx,
   const std::string & ip,
   const uint16_t port)
 : UdpSocket{ctx, ip, port, ip, port}
@@ -169,8 +169,8 @@ uint16_t UdpSocket::host_port() const
 
 void UdpSocket::open()
 {
-  m_udp_socket.open(udp::v4());
-  m_udp_socket.set_option(udp::socket::reuse_address(true));
+  m_udp_socket.open(asio::ip::udp::v4());
+  m_udp_socket.set_option(asio::ip::udp::socket::reuse_address(true));
 }
 
 void UdpSocket::close()
