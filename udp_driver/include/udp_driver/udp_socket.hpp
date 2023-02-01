@@ -78,18 +78,18 @@ public:
 
 private:
   void asyncSendHandler(
-    const asio::error_code & error,
+    const boost::system::error_code & error,
     std::size_t bytes_transferred);
 
   void asyncReceiveHandler(
-    const asio::error_code & error,
+    const boost::system::error_code & error,
     std::size_t bytes_transferred);
 
 private:
   const drivers::common::IoContext & m_ctx;
-  asio::ip::udp::socket m_udp_socket;
-  asio::ip::udp::endpoint m_remote_endpoint;
-  asio::ip::udp::endpoint m_host_endpoint;
+  boost::asio::ip::udp::socket m_udp_socket;
+  boost::asio::ip::udp::endpoint m_remote_endpoint;
+  boost::asio::ip::udp::endpoint m_host_endpoint;
   Functor m_func;
   static const size_t m_recv_buffer_size{2048};
   std::vector<uint8_t> m_recv_buffer;

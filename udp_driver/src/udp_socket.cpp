@@ -22,7 +22,7 @@
 #include <system_error>
 #include <vector>
 
-#include "asio.hpp"
+#include "boost/asio.hpp"
 #include "rclcpp/logging.hpp"
 
 namespace drivers
@@ -38,15 +38,15 @@ UdpSocket::UdpSocket(
   const uint16_t host_port)
 : m_ctx(ctx),
   m_udp_socket(ctx.ios()),
-  m_remote_endpoint(asio::ip::address::from_string(remote_ip), remote_port),
-  m_host_endpoint(asio::ip::address::from_string(host_ip), host_port)
+  m_remote_endpoint(boost::asio::ip::address::from_string(remote_ip), remote_port),
+  m_host_endpoint(boost::asio::ip::address::from_string(host_ip), host_port)
 {
   m_remote_endpoint = remote_ip.empty() ?
-    asio::ip::udp::endpoint{asio::ip::udp::v4(), remote_port} :
-  asio::ip::udp::endpoint{asio::ip::address::from_string(remote_ip), remote_port};
+    boost::asio::ip::udp::endpoint{boost::asio::ip::udp::v4(), remote_port} :
+  boost::asio::ip::udp::endpoint{boost::asio::ip::address::from_string(remote_ip), remote_port};
   m_host_endpoint = host_ip.empty() ?
-    asio::ip::udp::endpoint{asio::ip::udp::v4(), host_port} :
-  asio::ip::udp::endpoint{asio::ip::address::from_string(host_ip), host_port};
+    boost::asio::ip::udp::endpoint{boost::asio::ip::udp::v4(), host_port} :
+  boost::asio::ip::udp::endpoint{boost::asio::ip::address::from_string(host_ip), host_port};
   m_recv_buffer.resize(m_recv_buffer_size);
 }
 
@@ -65,7 +65,7 @@ UdpSocket::~UdpSocket()
 std::size_t UdpSocket::send(std::vector<uint8_t> & buff)
 {
   try {
-    return m_udp_socket.send_to(asio::buffer(buff), m_remote_endpoint);
+    return m_udp_socket.send_to(boost::asio::buffer(buff), m_remote_endpoint);
   } catch (const std::system_error & error) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("UdpSocket::send"), error.what());
     return -1;
@@ -74,16 +74,16 @@ std::size_t UdpSocket::send(std::vector<uint8_t> & buff)
 
 size_t UdpSocket::receive(std::vector<uint8_t> & buff)
 {
-  asio::error_code error;
-  asio::ip::udp::endpoint sender_endpoint;
+  boost::system::error_code error;
+  boost::asio::ip::udp::endpoint sender_endpoint;
 
   std::size_t len = m_udp_socket.receive_from(
-    asio::buffer(buff),
+    boost::asio::buffer(buff),
     m_host_endpoint,
     0,
     error);
 
-  if (error && error != asio::error::message_size) {
+  if (error && error != boost::asio::error::message_size) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("UdpSocket::receive"), error.message());
     return -1;
   }
@@ -93,8 +93,8 @@ size_t UdpSocket::receive(std::vector<uint8_t> & buff)
 void UdpSocket::asyncSend(std::vector<uint8_t> & buff)
 {
   m_udp_socket.async_send_to(
-    asio::buffer(buff), m_remote_endpoint,
-    [this](std::error_code error, std::size_t bytes_transferred)
+    boost::asio::buffer(buff), m_remote_endpoint,
+    [this](boost::system::error_code error, std::size_t bytes_transferred)
     {
       asyncSendHandler(error, bytes_transferred);
     });
@@ -104,16 +104,16 @@ void UdpSocket::asyncReceive(Functor func)
 {
   m_func = std::move(func);
   m_udp_socket.async_receive_from(
-    asio::buffer(m_recv_buffer),
+    boost::asio::buffer(m_recv_buffer),
     m_host_endpoint,
-    [this](std::error_code error, std::size_t bytes_transferred)
+    [this](boost::system::error_code error, std::size_t bytes_transferred)
     {
       asyncReceiveHandler(error, bytes_transferred);
     });
 }
 
 void UdpSocket::asyncSendHandler(
-  const asio::error_code & error,
+  const boost::system::error_code & error,
   std::size_t bytes_transferred)
 {
   (void)bytes_transferred;
@@ -123,7 +123,7 @@ void UdpSocket::asyncSendHandler(
 }
 
 void UdpSocket::asyncReceiveHandler(
-  const asio::error_code & error,
+  const boost::system::error_code & error,
   std::size_t bytes_transferred)
 {
   (void)bytes_transferred;
@@ -137,9 +137,9 @@ void UdpSocket::asyncReceiveHandler(
     m_func(m_recv_buffer);
     m_recv_buffer.resize(m_recv_buffer_size);
     m_udp_socket.async_receive_from(
-      asio::buffer(m_recv_buffer),
+      boost::asio::buffer(m_recv_buffer),
       m_host_endpoint,
-      [this](std::error_code error, std::size_t bytes_tf)
+      [this](boost::system::error_code error, std::size_t bytes_tf)
       {
         m_recv_buffer.resize(bytes_tf);
         asyncReceiveHandler(error, bytes_tf);
@@ -169,13 +169,13 @@ uint16_t UdpSocket::host_port() const
 
 void UdpSocket::open()
 {
-  m_udp_socket.open(asio::ip::udp::v4());
-  m_udp_socket.set_option(asio::ip::udp::socket::reuse_address(true));
+  m_udp_socket.open(boost::asio::ip::udp::v4());
+  m_udp_socket.set_option(boost::asio::ip::udp::socket::reuse_address(true));
 }
 
 void UdpSocket::close()
 {
-  asio::error_code error;
+  boost::system::error_code error;
   m_udp_socket.close(error);
   if (error) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("UdpSocket::close"), error.message());

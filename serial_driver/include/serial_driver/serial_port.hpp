@@ -23,7 +23,7 @@
 #include "io_context/common.hpp"
 #include "io_context/io_context.hpp"
 
-using spb = asio::serial_port_base;
+using spb = boost::asio::serial_port_base;
 using drivers::common::IoContext;
 
 namespace drivers
@@ -222,16 +222,16 @@ public:
 
 private:
   void async_send_handler(
-    const asio::error_code & error,
+    const boost::system::error_code & error,
     size_t bytes_transferred);
 
   void async_receive_handler(
-    const asio::error_code & error,
+    const boost::system::error_code & error,
     size_t bytes_transferred);
 
   const IoContext & m_ctx;
   std::string m_device_name;
-  asio::serial_port m_serial_port;
+  boost::asio::serial_port m_serial_port;
   SerialPortConfig m_port_config;
   Functor m_func;
   static constexpr size_t m_recv_buffer_size{2048};

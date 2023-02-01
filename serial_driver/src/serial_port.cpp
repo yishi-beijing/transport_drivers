@@ -45,19 +45,19 @@ SerialPort::~SerialPort()
 
 size_t SerialPort::send(const std::vector<uint8_t> & buff)
 {
-  return m_serial_port.write_some(asio::buffer(buff.data(), buff.size()));
+  return m_serial_port.write_some(boost::asio::buffer(buff.data(), buff.size()));
 }
 
 size_t SerialPort::receive(std::vector<uint8_t> & buff)
 {
-  return m_serial_port.read_some(asio::mutable_buffer(buff.data(), buff.size()));
+  return m_serial_port.read_some(boost::asio::mutable_buffer(buff.data(), buff.size()));
 }
 
 void SerialPort::async_send(const std::vector<uint8_t> & buff)
 {
   m_serial_port.async_write_some(
-    asio::buffer(buff),
-    [this](std::error_code error, size_t bytes_transferred)
+    boost::asio::buffer(buff),
+    [this](boost::system::error_code error, size_t bytes_transferred)
     {
       async_send_handler(error, bytes_transferred);
     });
@@ -67,8 +67,8 @@ void SerialPort::async_receive(Functor func)
 {
   m_func = std::move(func);
   m_serial_port.async_read_some(
-    asio::buffer(m_recv_buffer),
-    [this](std::error_code error, size_t bytes_transferred)
+    boost::asio::buffer(m_recv_buffer),
+    [this](boost::system::error_code error, size_t bytes_transferred)
     {
       async_receive_handler(error, bytes_transferred);
     });
@@ -85,7 +85,7 @@ bool SerialPort::send_break()
 }
 
 void SerialPort::async_send_handler(
-  const asio::error_code & error,
+  const boost::system::error_code & error,
   size_t bytes_transferred)
 {
   (void)bytes_transferred;
@@ -96,7 +96,7 @@ void SerialPort::async_send_handler(
 }
 
 void SerialPort::async_receive_handler(
-  const asio::error_code & error,
+  const boost::system::error_code & error,
   size_t bytes_transferred)
 {
   if (error) {
@@ -107,8 +107,8 @@ void SerialPort::async_receive_handler(
   if (bytes_transferred > 0 && m_func) {
     m_func(m_recv_buffer, bytes_transferred);
     m_serial_port.async_read_some(
-      asio::buffer(m_recv_buffer),
-      [this](std::error_code error, size_t bytes_transferred)
+      boost::asio::buffer(m_recv_buffer),
+      [this](boost::system::error_code error, size_t bytes_transferred)
       {
         async_receive_handler(error, bytes_transferred);
       });
@@ -136,7 +136,7 @@ void SerialPort::open()
 
 void SerialPort::close()
 {
-  asio::error_code error;
+  boost::system::error_code error;
   m_serial_port.close(error);
   if (error) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("SerialPort::close"), error.message());
