@@ -14,7 +14,7 @@
     <buildtool_depend>ament_cmake_auto</buildtool_depend>
     <buildtool_depend>asio_cmake_module</buildtool_depend>
 
-    <depend>asio</depend>
+    <depend>boost</depend>
     <depend>lifecycle_msgs</depend>
     <depend>rclcpp</depend>
     <depend>rclcpp_components</depend>
