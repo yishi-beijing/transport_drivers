@@ -31,6 +31,11 @@ ament_auto_find_build_dependencies()
 
 find_package(Boost REQUIRED)
 
+if(BUILD_TESTING)
+    find_package(ament_lint_auto)
+    ament_lint_auto_find_test_dependencies()
+endif()
+
 ament_auto_add_library(${PROJECT_NAME} SHARED
         src/tcp_socket.cpp
         src/tcp_driver.cpp
