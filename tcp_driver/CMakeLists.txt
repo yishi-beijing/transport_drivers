@@ -43,3 +43,5 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
         src/http_client_driver.cpp
         )
 ament_target_dependencies(${PROJECT_NAME} Boost)
+
+ament_auto_package()

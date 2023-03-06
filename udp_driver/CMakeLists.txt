@@ -89,3 +89,5 @@ if(BUILD_TESTING)
     target_link_libraries(${TEST_UDP_DRIVER_EXE} ${PROJECT_NAME} ${PROJECT_NAME}_nodes)
   endforeach()
 endif()
+
+ament_auto_package()
