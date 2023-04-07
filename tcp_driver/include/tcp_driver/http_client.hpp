@@ -55,7 +55,6 @@ public:
            */
   HttpClient(
     std::shared_ptr<boost::asio::io_context> ctx,
-//          boost::asio::io_context ctx,
     const std::string & ip, uint16_t port);
 
   /**
