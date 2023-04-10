@@ -89,11 +89,17 @@ std::size_t TcpSocket::send(std::vector<unsigned char> & buff)
   return 1;
 }
 
-size_t TcpSocket::receive(boost::asio::streambuf & buff)
+size_t TcpSocket::receive(boost::asio::streambuf & buff, int trans_size)
 {
   boost::asio::ip::tcp::endpoint sender_endpoint;
   boost::system::error_code error;
-  std::size_t len = boost::asio::read(*m_socket, buff, boost::asio::transfer_all(), error);
+
+  std::size_t len = -1;
+  if(trans_size <= 0){
+    len = boost::asio::read(*m_socket, buff, boost::asio::transfer_all(), error);
+  } else {
+    len = boost::asio::read(*m_socket, buff, boost::asio::transfer_exactly(trans_size), error);
+  }
 
   if (error && error != boost::asio::error::eof) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("TcpSocket::receive"), error.message());
@@ -101,6 +107,57 @@ size_t TcpSocket::receive(boost::asio::streambuf & buff)
     return -1;
   }
   return len;
+}
+
+
+void TcpSocket::syncSendReceiveHeaderPayload(
+  std::vector<unsigned char> & buff, Functor func_header,
+  Functor func_payload, std::function<void()> func_finally)
+{
+#ifdef WITH_DEBUG_STDCOUT_TCP_SOCKET
+  std::cout << "boost::asio::async_write" << std::endl;
+#endif
+  TcpSocket::send(buff);
+  size_t bytes_transferred = TcpSocket::receive(m_recv_buffer, 8);
+
+  if (bytes_transferred > 0) {
+#ifdef WITH_DEBUG_STDCOUT_TCP_SOCKET
+    std::cout << "std::vector<uint8_t> target(m_recv_buffer.size())" << std::endl;
+#endif
+    m_recv_header.resize(m_recv_buffer.size());
+    buffer_copy(boost::asio::buffer(m_recv_header), m_recv_buffer.data());
+    if (func_header) {
+      func_header(m_recv_header);
+    }
+
+    // for Hesai's header
+    int payload_num = static_cast<int>(static_cast<unsigned char>(m_recv_header[4]) << 24 |
+      static_cast<unsigned char>(m_recv_header[5]) << 16 |
+      static_cast<unsigned char>(m_recv_header[6]) << 8 |
+      static_cast<unsigned char>(m_recv_header[7]));
+
+#ifdef WITH_DEBUG_STDCOUT_TCP_SOCKET
+    std::cout << "payload_num: " << payload_num << std::endl;
+#endif
+
+    if (0 < payload_num) {
+      bytes_transferred = TcpSocket::receive(m_recv_buffer, payload_num);
+      m_recv_payload.resize(m_recv_buffer.size());
+      buffer_copy(boost::asio::buffer(m_recv_payload), m_recv_buffer.data());
+      if (func_payload) {
+        func_payload(m_recv_payload);
+      }
+#ifdef WITH_DEBUG_STDCOUT_TCP_SOCKET
+          std::cout << "TcpSocket::asyncReceiveHandlerHeaderPayload fin" << std::endl;
+#endif
+      m_recv_buffer.consume(m_recv_buffer.size());
+    } else {
+      m_recv_buffer.consume(m_recv_buffer.size());
+    }
+    if (func_finally) {
+      func_finally();
+    }
+  }
 }
 
 void TcpSocket::asyncSend(std::vector<unsigned char> & buff)

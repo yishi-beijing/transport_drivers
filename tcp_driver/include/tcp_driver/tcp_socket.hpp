@@ -149,10 +149,23 @@ public:
            * @brief Read received data
            *
            * @param buff Buffer for received data
+           * @param trans_size Receiving size for transfer_exactly (default: transfer_all)
            * @return size_t Length of received data
            */
-  size_t receive(boost::asio::streambuf & buff);
+  size_t receive(boost::asio::streambuf & buff, int trans_size = -1);
 
+  /**
+           * @brief syncSend and syncReceive with callbacks
+           *
+           * @param buff Data vector
+           * @param func_header Callback of syncSendHandler for header data
+           * @param func_payload Callback of syncSendHandler for payload data
+           * @param func_finally Callback to process after func_payload
+           */
+  void
+  syncSendReceiveHeaderPayload(
+    std::vector<unsigned char> & buff, Functor func_header, Functor func_payload,
+    std::function<void()> func_finally);
 
   /**
            * @brief asyncSend data without a callback

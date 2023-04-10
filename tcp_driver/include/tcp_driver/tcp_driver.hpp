@@ -98,6 +98,21 @@ public:
   bool isOpen() const;
 
   /**
+           * @brief syncSend data and syncReceive with callbacks
+           *
+           * @param buff Data vector
+           * @param func_header Callback of syncSendHandler for header data
+           * @param func_payload Callback of syncSendHandler for payload data
+           * @param func_finally Callback to process after func_payload
+           * @return true if the sync send function was successful
+           * @return false if the sync send function was not successful
+           */
+  bool
+  syncSendReceiveHeaderPayload(
+    std::vector<unsigned char> & buff, Functor func_header, Functor func_payload,
+    std::function<void()> func_finally);
+
+  /**
            * @brief asyncSend data without a callback
            *
            * @param buff Data vector
