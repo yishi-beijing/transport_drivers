@@ -20,6 +20,7 @@
 #include <vector>
 
 #include <boost/asio.hpp>
+#include <boost/lambda/lambda.hpp>
 
 namespace drivers
 {
@@ -306,6 +307,9 @@ private:
            *
            */
   std::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
+
+  /// @brief boost::asio::deadline_timer for connection
+  boost::asio::deadline_timer deadline_;
 
   /**
            * @brief Device IP address
