@@ -485,15 +485,9 @@ bool TcpSocket::open()
   m_socket->set_option(boost::asio::ip::tcp::socket::reuse_address(true));
 
   std::cout << m_remote_endpoint << std::endl;
-//  boost::system::error_code error;
-//  m_socket->connect(m_remote_endpoint, error);
 
-//  boost::asio::ip::tcp::resolver::query query(m_host_endpoint.address().to_string(), std::to_string(m_remote_endpoint.port()));
-//  boost::asio::ip::tcp::resolver::iterator iter = boost::asio::ip::tcp::resolver(m_ctx).resolve(query);
-//  boost::posix_time::time_duration timeout = boost::posix_time::seconds(5);
   boost::system::error_code ec = boost::asio::error::would_block;
 
-//  boost::asio::async_connect(m_socket, iter, var(ec) = _1);
   m_socket->async_connect(m_remote_endpoint, boost::lambda::var(ec) = boost::lambda::_1);
   deadline_.expires_from_now(boost::posix_time::seconds(5));
   deadline_.async_wait([this](const boost::system::error_code& ec2) {
@@ -503,27 +497,26 @@ bool TcpSocket::open()
     }
   });
 
+  /*
+  // sometimes infinite loop...
   while (ec == boost::asio::error::would_block){
     std::cout << "st: m_ctx->run_one();" << std::endl;
     m_ctx->run_one();
     std::cout << "ed: m_ctx->run_one();" << std::endl;
   }
-
+  */
   /*
+  // sometimes infinite loop...
   do{
     std::cout << "st: m_ctx->run_one();" << std::endl;
     m_ctx->run_one();
     std::cout << "ed: m_ctx->run_one();" << std::endl;
   }while (ec == boost::asio::error::would_block);
   */
+//  std::cout << "st: m_ctx->run_one();" << std::endl;
+  m_ctx->run_one();
+//  std::cout << "ed: m_ctx->run_one();" << std::endl;
 
-//  if (ec || !m_socket.is_open())
-//    throw boost::system::system_error(
-//        ec ? ec : boost::asio::error::operation_aborted);
-//  }
-
-
-//  if (error) {
   if (ec || !m_socket->is_open()) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("TcpSocket::open"), ec.message());
     reset_flg = true;

@@ -65,6 +65,24 @@ bool TcpDriver::isOpen() const
   return m_socket->isOpen();
 }
 
+bool TcpDriver::syncSendReceiveHeaderPayload(
+  std::vector<unsigned char> & buff, Functor func_header,
+  Functor func_payload, std::function<void()> func_finally)
+{
+  if (m_socket->needReset()) {
+    close();
+  }
+  if (!isOpen()) {
+    if (!open()) {
+      std::cerr << "TcpDriver::asyncSendReceiveHeaderPayload" << ": " << "socket open failed" <<
+        "\n";
+      return false;
+    }
+  }
+  m_socket->asyncSendReceiveHeaderPayload(buff, func_header, func_payload, func_finally);
+  return true;
+}
+
 bool TcpDriver::asyncSend(std::vector<unsigned char> & buff)
 {
   if (m_socket->needReset()) {
