@@ -497,25 +497,7 @@ bool TcpSocket::open()
     }
   });
 
-  /*
-  // sometimes infinite loop...
-  while (ec == boost::asio::error::would_block){
-    std::cout << "st: m_ctx->run_one();" << std::endl;
-    m_ctx->run_one();
-    std::cout << "ed: m_ctx->run_one();" << std::endl;
-  }
-  */
-  /*
-  // sometimes infinite loop...
-  do{
-    std::cout << "st: m_ctx->run_one();" << std::endl;
-    m_ctx->run_one();
-    std::cout << "ed: m_ctx->run_one();" << std::endl;
-  }while (ec == boost::asio::error::would_block);
-  */
-//  std::cout << "st: m_ctx->run_one();" << std::endl;
   m_ctx->run_one();
-//  std::cout << "ed: m_ctx->run_one();" << std::endl;
 
   if (ec || !m_socket->is_open()) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("TcpSocket::open"), ec.message());
