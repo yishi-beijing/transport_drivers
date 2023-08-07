@@ -15,7 +15,7 @@
 # Maintained by LeoDrive, 2021
 
 cmake_minimum_required(VERSION 3.5)
-project(io_context)
+project(boost_io_context)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -32,7 +32,7 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_library(${PROJECT_NAME} SHARED
   src/io_context.cpp
-  src/msg_converters/std_msgs.cpp
+  src/boost_msg_converters/std_msgs.cpp
 )
 
 if(BUILD_TESTING)

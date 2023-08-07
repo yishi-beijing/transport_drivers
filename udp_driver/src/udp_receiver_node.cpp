@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "udp_driver/udp_receiver_node.hpp"
+#include "boost_udp_driver/udp_receiver_node.hpp"
 
 #include <memory>
 #include <string>

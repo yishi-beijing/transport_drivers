@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-#include "tcp_driver/http_client.hpp"
+#include "boost_tcp_driver/http_client.hpp"
 
 #include <cstdlib>
 
@@ -309,7 +309,7 @@ void HttpClient::asyncOnResolve(
 
 void HttpClient::asyncOnConnect(boost::system::error_code ec)
 {
-  RCLCPP_INFO(rclcpp::get_logger("HttpClient::asyncOnConnect"), "asyncOnConnect");
+  RCLCPP_DEBUG(rclcpp::get_logger("HttpClient::asyncOnConnect"), "asyncOnConnect");
   if (ec) {
     return fail(ec, "asyncOnConnect");
   }
@@ -320,7 +320,7 @@ void HttpClient::asyncOnConnect(boost::system::error_code ec)
 #ifdef WITH_DEBUG_STDCOUT_HTTP_CLIENT
   std::cout << "will http::async_write(*m_socket, m_req," << std::endl;
 #endif
-  RCLCPP_INFO(rclcpp::get_logger("HttpClient::asyncOnConnect"), "async_write");
+  RCLCPP_DEBUG(rclcpp::get_logger("HttpClient::asyncOnConnect"), "async_write");
   boost::beast::http::async_write(
     *m_socket, m_req,
     [this](boost::system::error_code ec, std::size_t bytes_transferred) {

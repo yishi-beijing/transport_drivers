@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef UDP_DRIVER__UDP_RECEIVER_NODE_HPP_
-#define UDP_DRIVER__UDP_RECEIVER_NODE_HPP_
+#ifndef SERIAL_DRIVER__SERIAL_BRIDGE_NODE_HPP_
+#define SERIAL_DRIVER__SERIAL_BRIDGE_NODE_HPP_
 
-#include "udp_driver/udp_driver.hpp"
+#include "boost_serial_driver/serial_driver.hpp"
 
 #include <chrono>
 #include <memory>
@@ -30,30 +30,31 @@
 
 namespace lc = rclcpp_lifecycle;
 using LNI = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface;
+using std_msgs::msg::UInt8MultiArray;
 
 namespace drivers
 {
-namespace udp_driver
+namespace serial_driver
 {
 
-/// \brief UdpReceiverNode class which can receive UDP datagrams
-class UdpReceiverNode final
+/// \brief SerialBridgeNode class which can send and receive serial data
+class SerialBridgeNode final
   : public lc::LifecycleNode
 {
 public:
   /// \brief Default constructor
   /// \param[in] options Options for the node
-  explicit UdpReceiverNode(const rclcpp::NodeOptions & options);
+  explicit SerialBridgeNode(const rclcpp::NodeOptions & options);
 
   /// \brief Constructor which accepts IoContext
   /// \param[in] options Options for the node
   /// \param[in] ctx A shared IoContext
-  UdpReceiverNode(
-    const rclcpp::NodeOptions &,
-    const drivers::common::IoContext & ctx);
+  SerialBridgeNode(
+    const rclcpp::NodeOptions & options,
+    const IoContext & ctx);
 
   /// \brief Destructor - required to manage owned IoContext
-  ~UdpReceiverNode();
+  ~SerialBridgeNode();
 
   /// \brief Callback from transition to "configuring" state.
   /// \param[in] state The current state that the node is in.
@@ -75,20 +76,24 @@ public:
   /// \param[in] state The current state that the node is in.
   LNI::CallbackReturn on_shutdown(const lc::State & state) override;
 
-  /// \breif Callback for receiving a UDP datagram
-  void receiver_callback(const std::vector<uint8_t> & buffer);
+  /// \brief Callback for sending a raw serial message
+  void subscriber_callback(const UInt8MultiArray::SharedPtr msg);
+
+  /// \breif Callback for when serial data are received
+  void receive_callback(const std::vector<uint8_t> & buffer, const size_t & bytes_transferred);
 
 private:
   void get_params();
 
-  std::unique_ptr<drivers::common::IoContext> m_owned_ctx{};
-  std::string m_ip{};
-  uint16_t m_port{};
-  std::unique_ptr<UdpDriver> m_udp_driver;
-  lc::LifecyclePublisher<udp_msgs::msg::UdpPacket>::SharedPtr m_publisher;
-};  // class UdpReceiverNode
+  std::unique_ptr<IoContext> m_owned_ctx{};
+  std::string m_device_name{};
+  std::unique_ptr<SerialPortConfig> m_device_config;
+  std::unique_ptr<SerialDriver> m_serial_driver;
+  lc::LifecyclePublisher<UInt8MultiArray>::SharedPtr m_publisher;
+  rclcpp::Subscription<UInt8MultiArray>::SharedPtr m_subscriber;
+};  // class SerialBridgeNode
 
-}  // namespace udp_driver
+}  // namespace serial_driver
 }  // namespace drivers
 
-#endif  // UDP_DRIVER__UDP_RECEIVER_NODE_HPP_
+#endif  // SERIAL_DRIVER__SERIAL_BRIDGE_NODE_HPP_

@@ -14,7 +14,7 @@
 # Co-developed by MAP IV, Inc. and TIER IV, Inc.
 
 cmake_minimum_required(VERSION 3.5)
-project(tcp_driver)
+project(boost_tcp_driver)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)

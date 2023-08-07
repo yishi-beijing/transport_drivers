@@ -15,7 +15,7 @@
 # Maintained by LeoDrive, 2021
 
 cmake_minimum_required(VERSION 3.5)
-project(udp_driver)
+project(boost_udp_driver)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -46,12 +46,12 @@ ament_target_dependencies(${PROJECT_NAME}_nodes Boost)
 target_link_libraries(${PROJECT_NAME}_nodes ${PROJECT_NAME})
 
 rclcpp_components_register_node(${PROJECT_NAME}_nodes
-  PLUGIN "drivers::udp_driver::UdpReceiverNode"
+  PLUGIN "drivers::boost_udp_driver::UdpReceiverNode"
   EXECUTABLE udp_receiver_node_exe
 )
 
 rclcpp_components_register_node(${PROJECT_NAME}_nodes
-  PLUGIN "drivers::udp_driver::UdpSenderNode"
+  PLUGIN "drivers::boost_udp_driver::UdpSenderNode"
   EXECUTABLE udp_sender_node_exe
 )
 

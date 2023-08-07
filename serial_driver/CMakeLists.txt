@@ -14,7 +14,7 @@
 #
 # Co-developed by Tier IV, Inc. and Apex.AI, Inc.
 cmake_minimum_required(VERSION 3.5)
-project(serial_driver)
+project(boost_serial_driver)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -39,7 +39,7 @@ ament_auto_add_library(${PROJECT_NAME}_nodes SHARED
 )
 
 rclcpp_components_register_node(${PROJECT_NAME}_nodes
-  PLUGIN "drivers::serial_driver::SerialBridgeNode"
+  PLUGIN "drivers::boost_serial_driver::SerialBridgeNode"
   EXECUTABLE "serial_bridge"
 )
 

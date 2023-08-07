@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "tcp_driver/tcp_socket.hpp"
+#include "boost_tcp_driver/tcp_socket.hpp"
 
 #include <iostream>
 #include <utility>
@@ -492,7 +492,7 @@ bool TcpSocket::open()
   deadline_.expires_from_now(boost::posix_time::seconds(5));
   deadline_.async_wait([this](const boost::system::error_code& ec2) {
     if (!ec2) {
-      std::cerr << "# Canceling socket operation.\n";
+      std::cerr << "# Canceling socket operation due to timeout (5s).\n";
       m_socket->cancel();
     }
   });

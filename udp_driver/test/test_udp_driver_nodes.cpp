@@ -24,8 +24,8 @@
 #include <lifecycle_msgs/msg/state.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-#include "udp_driver/udp_receiver_node.hpp"
-#include "udp_driver/udp_sender_node.hpp"
+#include "boost_udp_driver/udp_receiver_node.hpp"
+#include "boost_udp_driver/udp_sender_node.hpp"
 
 using drivers::common::IoContext;
 using drivers::udp_driver::UdpSocket;
