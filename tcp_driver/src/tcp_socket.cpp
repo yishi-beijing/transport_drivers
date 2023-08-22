@@ -146,6 +146,9 @@ void TcpSocket::syncSendReceiveHeaderPayload(
       m_recv_payload.resize(m_recv_buffer.size());
       buffer_copy(boost::asio::buffer(m_recv_payload), m_recv_buffer.data());
       if (func_payload) {
+#ifdef WITH_DEBUG_STDCOUT_TCP_SOCKET
+          std::cout << "run func_payload" << std::endl;
+#endif
         func_payload(m_recv_payload);
       }
 #ifdef WITH_DEBUG_STDCOUT_TCP_SOCKET
@@ -236,8 +239,9 @@ void TcpSocket::asyncReceiveHeaderPayloadRetry(
   m_func_h = std::move(func_header);
   m_func_p = std::move(func_payload);
   m_func_f = std::move(func_finally);
-
+#ifdef WITH_DEBUG_STDCOUT_TCP_SOCKET
   std::cout << "boost::asio::async_read" << std::endl;
+#endif
   boost::asio::async_read(
     *m_socket,
     m_recv_buffer,
@@ -510,7 +514,7 @@ bool TcpSocket::open()
   return true;
 }
 
-void TcpSocket::close()
+void TcpSocket::closeSync()
 {
   boost::system::error_code error;
   m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
@@ -521,6 +525,26 @@ void TcpSocket::close()
   if (error) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("TcpSocket::close"), error.message());
   }
+}
+
+void TcpSocket::close()
+{
+  m_ctx->post([this]() {
+    boost::system::error_code error;
+    m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+    if (error && error != boost::system::errc::not_connected) {
+      RCLCPP_ERROR_STREAM(rclcpp::get_logger("TcpSocket::shutdown"), error.message());
+    }
+  });
+  m_ctx->post([this]() {
+    boost::system::error_code error;
+    m_socket->close(error);
+    if (error) {
+      RCLCPP_ERROR_STREAM(rclcpp::get_logger("TcpSocket::close"), error.message());
+    }
+    m_socket.reset();
+  });
+  m_ctx->run();
 }
 
 bool TcpSocket::isOpen() const

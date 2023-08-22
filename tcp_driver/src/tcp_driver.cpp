@@ -57,12 +57,17 @@ bool TcpDriver::open()
 
 void TcpDriver::close()
 {
-  m_socket->close();
+  if(m_socket != NULL){
+    m_socket->close();
+  }
 }
 
 bool TcpDriver::isOpen() const
 {
-  return m_socket->isOpen();
+  if(m_socket != NULL){
+    return m_socket->isOpen();
+  }
+  return false;
 }
 
 bool TcpDriver::syncSendReceiveHeaderPayload(

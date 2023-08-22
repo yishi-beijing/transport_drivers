@@ -117,7 +117,13 @@ public:
   bool open();
 
   /**
-           * @brief Close the socket
+           * @brief Close the socket (sync)
+           *
+           */
+  void closeSync();
+
+  /**
+           * @brief Close the socket (async)
            *
            */
   void close();
