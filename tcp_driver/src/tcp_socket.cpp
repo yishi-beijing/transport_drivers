@@ -501,11 +501,7 @@ bool TcpSocket::open()
   std::cout << m_remote_endpoint << std::endl;
 
   boost::system::error_code ec = boost::asio::error::would_block;
-//  boost::asio::io_context io_context;
-//  boost::asio::deadline_timer dlt(*m_ctx);
-//  boost::asio::deadline_timer dlt(io_context);
   deadline_.expires_from_now(boost::posix_time::seconds(5));
-//  dlt.expires_from_now(boost::posix_time::seconds(5));
   deadline_.async_wait([this](const boost::system::error_code& ec2) {
     if (!ec2) {
       std::cerr << "# Canceling socket operation due to timeout (5s).\n";
@@ -515,11 +511,7 @@ bool TcpSocket::open()
   });
   m_socket->async_connect(m_remote_endpoint, boost::lambda::var(ec) = boost::lambda::_1);
 
-  std::cout << "st: m_ctx->run_one();" << std::endl;
-//  m_ctx->run_one();
   do m_ctx->run_one(); while (ec == boost::asio::error::would_block);
-//  io_context.run_one();
-  std::cout << "ed: m_ctx->run_one();" << std::endl;
 
   if (ec || !m_socket->is_open()) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("TcpSocket::open"), ec.message());
