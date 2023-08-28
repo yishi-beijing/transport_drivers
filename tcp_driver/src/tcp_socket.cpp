@@ -511,6 +511,7 @@ bool TcpSocket::open()
     RCLCPP_INFO_STREAM(rclcpp::get_logger("TcpSocket::open"), "connected");
   }
   reset_flg = false;
+  deadline_.cancel();
   return true;
 }
 
