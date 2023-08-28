@@ -35,6 +35,11 @@ TcpDriver::~TcpDriver()
 
 void TcpDriver::init_socket(const std::string & ip, uint16_t port)
 {
+  /*
+  if(m_socket){
+    m_socket->closeSync();
+  }
+  */
   m_socket.reset(new TcpSocket(m_ctx, ip, port));
 }
 
@@ -42,6 +47,11 @@ void TcpDriver::init_socket(
   const std::string & remote_ip, uint16_t remote_port,
   const std::string & host_ip, uint16_t host_port)
 {
+  /*
+  if(m_socket){
+    m_socket->closeSync();
+  }
+  */
   m_socket.reset(new TcpSocket(m_ctx, remote_ip, remote_port, host_ip, host_port));
 }
 
@@ -53,6 +63,13 @@ std::shared_ptr<TcpSocket> TcpDriver::socket() const
 bool TcpDriver::open()
 {
   return m_socket->open();
+}
+
+void TcpDriver::closeSync()
+{
+  if(m_socket != NULL){
+    m_socket->closeSync();
+  }
 }
 
 void TcpDriver::close()

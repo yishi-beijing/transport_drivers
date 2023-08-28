@@ -64,6 +64,9 @@ TcpSocket::TcpSocket(
 
 TcpSocket::~TcpSocket()
 {
+#ifdef WITH_DEBUG_STDCOUT_TCP_SOCKET
+  std::cout << "TcpSocket::~TcpSocket()" << std::endl;
+#endif
   close();
   m_socket.reset();
 }
@@ -491,33 +494,46 @@ uint16_t TcpSocket::host_port() const
 // https://stackoverflow.com/questions/32692195/set-timeout-for-boost-socket-connect
 bool TcpSocket::open()
 {
+  m_ctx->restart();
   m_socket->open(boost::asio::ip::tcp::v4());
   m_socket->set_option(boost::asio::ip::tcp::socket::reuse_address(true));
 
   std::cout << m_remote_endpoint << std::endl;
 
   boost::system::error_code ec = boost::asio::error::would_block;
-
-  m_socket->async_connect(m_remote_endpoint, boost::lambda::var(ec) = boost::lambda::_1);
+//  boost::asio::io_context io_context;
+//  boost::asio::deadline_timer dlt(*m_ctx);
+//  boost::asio::deadline_timer dlt(io_context);
   deadline_.expires_from_now(boost::posix_time::seconds(5));
+//  dlt.expires_from_now(boost::posix_time::seconds(5));
   deadline_.async_wait([this](const boost::system::error_code& ec2) {
     if (!ec2) {
       std::cerr << "# Canceling socket operation due to timeout (5s).\n";
       m_socket->cancel();
+      m_ctx->restart();
     }
   });
+  m_socket->async_connect(m_remote_endpoint, boost::lambda::var(ec) = boost::lambda::_1);
 
-  m_ctx->run_one();
+  std::cout << "st: m_ctx->run_one();" << std::endl;
+//  m_ctx->run_one();
+  do m_ctx->run_one(); while (ec == boost::asio::error::would_block);
+//  io_context.run_one();
+  std::cout << "ed: m_ctx->run_one();" << std::endl;
 
   if (ec || !m_socket->is_open()) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger("TcpSocket::open"), ec.message());
+    m_socket->cancel();
     reset_flg = true;
+    deadline_.cancel();
+    m_ctx->restart();
     return false;
   } else {
     RCLCPP_INFO_STREAM(rclcpp::get_logger("TcpSocket::open"), "connected");
   }
   reset_flg = false;
   deadline_.cancel();
+  m_ctx->restart();
   return true;
 }
 
@@ -556,7 +572,10 @@ void TcpSocket::close()
 
 bool TcpSocket::isOpen() const
 {
-  return m_socket->is_open();
+  if(m_socket != NULL){
+    return m_socket->is_open();
+  }
+  return false;
 }
 
 void TcpSocket::bind()
