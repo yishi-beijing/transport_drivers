@@ -379,7 +379,7 @@ void TcpSocket::asyncReceiveHandlerHeaderPayload(
   std::cout << "TcpSocket::asyncReceiveHandlerHeaderPayload" << std::endl;
 #endif
   (void) bytes_transferred;
-  if (error) {
+  if (error && error != boost::asio::error::eof) {
     RCLCPP_ERROR_STREAM(
       rclcpp::get_logger(
         "TcpSocket::asyncReceiveHandlerHeaderPayload"), error.message());
