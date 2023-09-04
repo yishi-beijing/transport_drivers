@@ -389,6 +389,7 @@ void TcpSocket::asyncReceiveHandlerHeaderPayload(
 
   if (bytes_transferred > 0) {
 #ifdef WITH_DEBUG_STDCOUT_TCP_SOCKET
+    std::cout << "bytes_transferred > 0" << std::endl;
     std::cout << "std::vector<uint8_t> target(m_recv_buffer.size())" << std::endl;
 #endif
     m_recv_header.resize(m_recv_buffer.size());
@@ -439,6 +440,12 @@ void TcpSocket::asyncReceiveHandlerHeaderPayload(
     if (m_func_f) {
       m_func_f();
     }
+  }
+  else
+  {
+#ifdef WITH_DEBUG_STDCOUT_TCP_SOCKET
+    std::cout << "not (bytes_transferred > 0)" << std::endl;
+#endif
   }
 }
 
