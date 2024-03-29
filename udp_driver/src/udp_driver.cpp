@@ -47,6 +47,18 @@ void UdpDriver::init_receiver(const std::string & ip, uint16_t port)
   m_receiver.reset(new UdpSocket(m_ctx, ip, port));
 }
 
+void UdpDriver::init_receiver(const std::string & remote_ip, uint16_t remote_port,
+    const std::string & host_ip, uint16_t host_port)
+{
+  m_receiver.reset(new UdpSocket(m_ctx, remote_ip, remote_port, host_ip, host_port));
+}
+
+void UdpDriver::init_receiver(const std::string & remote_ip, uint16_t remote_port,
+    const std::string & host_ip, uint16_t host_port, size_t buffer_size)
+{
+  m_receiver.reset(new UdpSocket(m_ctx, remote_ip, remote_port, host_ip, host_port, buffer_size));
+}
+
 void UdpDriver::init_receiver(const std::string & ip, uint16_t port, size_t buffer_size)
 {
   m_receiver.reset(new UdpSocket(m_ctx, ip, port, buffer_size));

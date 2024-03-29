@@ -30,6 +30,7 @@ namespace udp_driver
 {
 
 using Functor = std::function<void (const std::vector<uint8_t> &)>;
+using FunctorWithSender = std::function<void (const std::vector<uint8_t> &, const std::string & sender)>;
 
 class UdpSocket
 {
@@ -64,6 +65,7 @@ public:
   void close();
   bool isOpen() const;
   void bind();
+  void setMulticast(bool value);
 
   /*
    * Blocking Send Operation
@@ -85,6 +87,11 @@ public:
    */
   void asyncReceive(Functor func);
 
+  /*
+   * NonBlocking Receive Operation with Sender information
+   */
+  void asyncReceiveWithSender(FunctorWithSender func);
+
 private:
   void asyncSendHandler(
     const boost::system::error_code & error,
@@ -94,15 +101,24 @@ private:
     const boost::system::error_code & error,
     std::size_t bytes_transferred);
 
+  void asyncReceiveHandler2(
+    const boost::system::error_code & error,
+    std::size_t bytes_transferred);
+
 private:
   const drivers::common::IoContext & m_ctx;
   boost::asio::ip::udp::socket m_udp_socket;
   boost::asio::ip::udp::endpoint m_remote_endpoint;
   boost::asio::ip::udp::endpoint m_host_endpoint;
+  boost::asio::ip::udp::endpoint m_any_endpoint;
   Functor m_func;
+  FunctorWithSender m_func_with_sender;
   static constexpr size_t m_default_recv_buffer_size{2048};
   size_t m_recv_buffer_size;
+  bool m_use_multicast;
   std::vector<uint8_t> m_recv_buffer;
+
+  boost::asio::ip::udp::endpoint sender_endpoint_;
 };
 
 }  // namespace udp_driver

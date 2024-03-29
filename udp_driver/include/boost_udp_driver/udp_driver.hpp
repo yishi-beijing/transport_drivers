@@ -39,6 +39,8 @@ public:
     const std::string & remote_ip, uint16_t remote_port,
     const std::string & host_ip, uint16_t host_port);
   void init_receiver(const std::string & ip, uint16_t port);
+  void init_receiver(const std::string & remote_ip, uint16_t remote_port, const std::string & host_ip, uint16_t host_port);
+  void init_receiver(const std::string & remote_ip, uint16_t remote_port, const std::string & host_ip, uint16_t host_port, size_t buffer_size);
   void init_receiver(const std::string & ip, uint16_t port, size_t buffer_size);
 
 
