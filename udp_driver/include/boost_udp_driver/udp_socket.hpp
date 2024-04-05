@@ -29,8 +29,8 @@ namespace drivers
 namespace udp_driver
 {
 
-using Functor = std::function<void (const std::vector<uint8_t> &)>;
-using FunctorWithSender = std::function<void (const std::vector<uint8_t> &, const std::string & sender)>;
+using Functor = std::function<void (std::vector<uint8_t> &)>;
+using FunctorWithSender = std::function<void (std::vector<uint8_t> &, const std::string & sender)>;
 
 class UdpSocket
 {
