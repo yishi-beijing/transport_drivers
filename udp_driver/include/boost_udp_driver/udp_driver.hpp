@@ -21,7 +21,7 @@
 #include <memory>
 #include <string>
 
-#include "io_context/io_context.hpp"
+#include "boost_io_context/io_context.hpp"
 #include "udp_socket.hpp"
 
 namespace drivers
@@ -32,19 +32,23 @@ namespace udp_driver
 class UdpDriver
 {
 public:
-  explicit UdpDriver(const IoContext & ctx);
+  explicit UdpDriver(const drivers::common::IoContext & ctx);
 
   void init_sender(const std::string & ip, uint16_t port);
   void init_sender(
     const std::string & remote_ip, uint16_t remote_port,
     const std::string & host_ip, uint16_t host_port);
   void init_receiver(const std::string & ip, uint16_t port);
+  void init_receiver(const std::string & remote_ip, uint16_t remote_port, const std::string & host_ip, uint16_t host_port);
+  void init_receiver(const std::string & remote_ip, uint16_t remote_port, const std::string & host_ip, uint16_t host_port, size_t buffer_size);
+  void init_receiver(const std::string & ip, uint16_t port, size_t buffer_size);
+
 
   std::shared_ptr<UdpSocket> sender() const;
   std::shared_ptr<UdpSocket> receiver() const;
 
 private:
-  const IoContext & m_ctx;
+  const drivers::common::IoContext & m_ctx;
   std::shared_ptr<UdpSocket> m_sender;
   std::shared_ptr<UdpSocket> m_receiver;
 };

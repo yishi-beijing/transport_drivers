@@ -21,7 +21,7 @@
 #include <vector>
 #include <utility>
 
-#include "io_context/common.hpp"
+#include "boost_io_context/common.hpp"
 
 namespace drivers
 {
@@ -66,7 +66,7 @@ public:
   IoContext(const IoContext &) = delete;
   IoContext & operator=(const IoContext &) = delete;
 
-  asio::io_service & ios() const;
+  boost::asio::io_service & ios() const;
 
   bool isServiceStopped();
   uint32_t serviceThreadCount();
@@ -80,8 +80,8 @@ public:
   }
 
 private:
-  std::shared_ptr<asio::io_service> m_ios;
-  std::shared_ptr<asio::io_service::work> m_work;
+  std::shared_ptr<boost::asio::io_service> m_ios;
+  std::shared_ptr<boost::asio::io_service::work> m_work;
   std::shared_ptr<drivers::common::thread_group> m_ios_thread_workers;
 };
 

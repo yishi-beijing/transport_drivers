@@ -15,7 +15,7 @@
 #ifndef SERIAL_DRIVER__SERIAL_BRIDGE_NODE_HPP_
 #define SERIAL_DRIVER__SERIAL_BRIDGE_NODE_HPP_
 
-#include "serial_driver/serial_driver.hpp"
+#include "boost_serial_driver/serial_driver.hpp"
 
 #include <chrono>
 #include <memory>
@@ -26,7 +26,7 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <lifecycle_msgs/msg/state.hpp>
 
-#include "msg_converters/converters.hpp"
+#include "boost_msg_converters/converters.hpp"
 
 namespace lc = rclcpp_lifecycle;
 using LNI = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface;

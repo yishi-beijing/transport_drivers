@@ -17,34 +17,40 @@
 #ifndef UDP_DRIVER__UDP_SOCKET_HPP_
 #define UDP_DRIVER__UDP_SOCKET_HPP_
 
-#include <array>
+#include "boost_io_context/io_context.hpp"
+
+#include <cstddef>
+#include <cstdint>
 #include <string>
 #include <vector>
-
-#include "io_context/io_context.hpp"
-#include "msg_converters/converters.hpp"
-
-using asio::ip::udp;
-using asio::ip::address;
-using drivers::common::IoContext;
 
 namespace drivers
 {
 namespace udp_driver
 {
 
-using Functor = std::function<void (const std::vector<uint8_t> &)>;
+using Functor = std::function<void (std::vector<uint8_t> &)>;
+using FunctorWithSender = std::function<void (std::vector<uint8_t> &, const std::string & sender)>;
 
 class UdpSocket
 {
 public:
   UdpSocket(
-    const IoContext & ctx,
+    const drivers::common::IoContext & ctx,
     const std::string & remote_ip, uint16_t remote_port,
     const std::string & host_ip, uint16_t host_port);
   UdpSocket(
-    const IoContext & ctx,
+    const drivers::common::IoContext & ctx,
+    const std::string & remote_ip, uint16_t remote_port,
+    const std::string & host_ip, uint16_t host_port, 
+    size_t recv_buffer_size);
+  UdpSocket(
+    const drivers::common::IoContext & ctx,
     const std::string & ip, uint16_t port);
+  UdpSocket(
+    const drivers::common::IoContext & ctx,
+    const std::string & ip, uint16_t port,
+    size_t recv_buffer_size);
   ~UdpSocket();
 
   UdpSocket(const UdpSocket &) = delete;
@@ -59,6 +65,17 @@ public:
   void close();
   bool isOpen() const;
   void bind();
+  void setMulticast(bool value);
+
+  /**
+   * @brief Set the socket's internal receive buffer size to `n_bytes`. See `SO_RCVBUF` in `man 7
+   * socket` for more information.
+   *
+   * @param n_bytes The number of bytes to allocate.
+   * @return true If the buffer has been resized successfully.
+   * @return false If there was an error, such as the `net.core.rmem_max` value being exceeded.
+   */
+  bool setKernelBufferSize(int32_t n_bytes);
 
   /*
    * Blocking Send Operation
@@ -80,23 +97,38 @@ public:
    */
   void asyncReceive(Functor func);
 
+  /*
+   * NonBlocking Receive Operation with Sender information
+   */
+  void asyncReceiveWithSender(FunctorWithSender func);
+
 private:
   void asyncSendHandler(
-    const asio::error_code & error,
+    const boost::system::error_code & error,
     std::size_t bytes_transferred);
 
   void asyncReceiveHandler(
-    const asio::error_code & error,
+    const boost::system::error_code & error,
+    std::size_t bytes_transferred);
+
+  void asyncReceiveHandler2(
+    const boost::system::error_code & error,
     std::size_t bytes_transferred);
 
 private:
-  const IoContext & m_ctx;
-  udp::socket m_udp_socket;
-  udp::endpoint m_remote_endpoint;
-  udp::endpoint m_host_endpoint;
+  const drivers::common::IoContext & m_ctx;
+  boost::asio::ip::udp::socket m_udp_socket;
+  boost::asio::ip::udp::endpoint m_remote_endpoint;
+  boost::asio::ip::udp::endpoint m_host_endpoint;
+  boost::asio::ip::udp::endpoint m_any_endpoint;
   Functor m_func;
-  static const size_t m_recv_buffer_size{2048};
+  FunctorWithSender m_func_with_sender;
+  static constexpr size_t m_default_recv_buffer_size{2048};
+  size_t m_recv_buffer_size;
+  bool m_use_multicast;
   std::vector<uint8_t> m_recv_buffer;
+
+  boost::asio::ip::udp::endpoint sender_endpoint_;
 };
 
 }  // namespace udp_driver

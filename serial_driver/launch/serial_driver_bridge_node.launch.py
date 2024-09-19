@@ -31,7 +31,7 @@ from lifecycle_msgs.msg import Transition
 
 
 def generate_launch_description():
-    share_dir = get_package_share_directory('serial_driver')
+    share_dir = get_package_share_directory('boost_serial_driver')
     node_name = 'serial_bridge_node'
 
     params_declare = DeclareLaunchArgument(
@@ -42,7 +42,7 @@ def generate_launch_description():
     )
 
     bridge_node = LifecycleNode(
-        package='serial_driver',
+        package='boost_serial_driver',
         executable='serial_bridge',
         name=node_name,
         namespace=TextSubstitution(text=''),

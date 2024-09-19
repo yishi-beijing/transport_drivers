@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>io_context</name>
+  <name>boost_io_context</name>
   <version>1.2.0</version>
   <description>A library to write Synchronous and Asynchronous networking applications</description>
   <maintainer email="whitleysoftwareservices@gmail.com">Joshua Whitley</maintainer>
@@ -11,9 +11,9 @@
   <url type="bugtracker">https://github.com/ros-drivers/transport_drivers/issues</url>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
-  <buildtool_depend>asio_cmake_module</buildtool_depend>
 
-  <depend>asio</depend>
+  <build_depend>libboost-dev</build_depend>
+
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
   <depend>udp_msgs</depend>

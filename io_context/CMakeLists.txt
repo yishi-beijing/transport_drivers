@@ -15,7 +15,7 @@
 # Maintained by LeoDrive, 2021
 
 cmake_minimum_required(VERSION 3.14.4)
-project(io_context)
+project(boost_io_context)
 
 # Default to C++17
 if(NOT CMAKE_CXX_STANDARD)
@@ -30,14 +30,10 @@ endif()
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
-find_package(asio_cmake_module REQUIRED)
-find_package(ASIO REQUIRED)
-
 ament_auto_add_library(${PROJECT_NAME} SHARED
   src/io_context.cpp
-  src/msg_converters/std_msgs.cpp
+  src/boost_msg_converters/std_msgs.cpp
 )
-ament_target_dependencies(${PROJECT_NAME} "ASIO")
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -47,7 +43,7 @@ if(BUILD_TESTING)
 
   ament_add_gtest(${TEST_UDP_DRIVER_EXE}
           test/${name}.cpp)
-  ament_target_dependencies(${TEST_UDP_DRIVER_EXE} std_msgs udp_msgs "ASIO")
+  ament_target_dependencies(${TEST_UDP_DRIVER_EXE} std_msgs udp_msgs)
 
   target_include_directories(${TEST_UDP_DRIVER_EXE} PRIVATE include)
   target_link_libraries(${TEST_UDP_DRIVER_EXE} ${PROJECT_NAME})
@@ -56,5 +52,5 @@ endif()
 target_compile_options(${PROJECT_NAME} PUBLIC "-O0" PRIVATE -Wall)
 
 ament_auto_package(
-  CONFIG_EXTRAS_POST "io_context-extras.cmake"
+
 )

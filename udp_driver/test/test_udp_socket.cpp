@@ -16,7 +16,7 @@
 
 #include <gtest/gtest.h>
 
-#include "udp_driver/udp_socket.hpp"
+#include "boost_udp_driver/udp_socket.hpp"
 
 using drivers::common::IoContext;
 using drivers::udp_driver::UdpSocket;

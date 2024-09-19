@@ -15,7 +15,7 @@
 # Maintained by LeoDrive, 2021
 
 cmake_minimum_required(VERSION 3.14.4)
-project(udp_driver)
+project(boost_udp_driver)
 
 # Default to C++17
 if(NOT CMAKE_CXX_STANDARD)
@@ -30,29 +30,28 @@ endif()
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
-find_package(asio_cmake_module REQUIRED)
-find_package(ASIO REQUIRED)
+find_package(Boost REQUIRED)
 
 ament_auto_add_library(${PROJECT_NAME} SHARED
   src/udp_socket.cpp
   src/udp_driver.cpp
 )
-ament_target_dependencies(${PROJECT_NAME} "ASIO")
+ament_target_dependencies(${PROJECT_NAME} Boost)
 
 ament_auto_add_library(${PROJECT_NAME}_nodes SHARED
   src/udp_receiver_node.cpp
   src/udp_sender_node.cpp
 )
-ament_target_dependencies(${PROJECT_NAME}_nodes "ASIO")
+ament_target_dependencies(${PROJECT_NAME}_nodes Boost)
 target_link_libraries(${PROJECT_NAME}_nodes ${PROJECT_NAME})
 
 rclcpp_components_register_node(${PROJECT_NAME}_nodes
-  PLUGIN "drivers::udp_driver::UdpReceiverNode"
+  PLUGIN "drivers::boost_udp_driver::UdpReceiverNode"
   EXECUTABLE udp_receiver_node_exe
 )
 
 rclcpp_components_register_node(${PROJECT_NAME}_nodes
-  PLUGIN "drivers::udp_driver::UdpSenderNode"
+  PLUGIN "drivers::boost_udp_driver::UdpSenderNode"
   EXECUTABLE udp_sender_node_exe
 )
 
@@ -61,7 +60,7 @@ ament_auto_add_executable(udp_bridge_node_exe
 )
 
 target_link_libraries(udp_bridge_node_exe ${PROJECT_NAME} ${PROJECT_NAME}_nodes)
-ament_target_dependencies(udp_bridge_node_exe ASIO)
+ament_target_dependencies(udp_bridge_node_exe Boost)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -84,13 +83,11 @@ if(BUILD_TESTING)
       std_msgs
       udp_msgs
       lifecycle_msgs
-      ASIO)
+      Boost)
 
     target_include_directories(${TEST_UDP_DRIVER_EXE} PRIVATE include)
     target_link_libraries(${TEST_UDP_DRIVER_EXE} ${PROJECT_NAME} ${PROJECT_NAME}_nodes)
   endforeach()
 endif()
 
-ament_auto_package(
-  CONFIG_EXTRAS_POST "udp_driver-extras.cmake"
-)
+ament_auto_package()

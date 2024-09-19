@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
-  <name>serial_driver</name>
+  <name>boost_serial_driver</name>
   <version>1.2.0</version>
   <description>A template class and associated utilities which encapsulate basic reading from serial ports</description>
   <maintainer email="whitleysoftwareservices@gmail.com">Joshua Whitley</maintainer>
@@ -12,10 +12,10 @@
   <author>Esteve Fernandez</author>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
-  <buildtool_depend>asio_cmake_module</buildtool_depend>
 
-  <depend>asio</depend>
-  <depend>io_context</depend>
+  <build_depend>libboost-dev</build_depend>
+
+  <depend>boost_io_context</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>rclcpp_lifecycle</depend>
