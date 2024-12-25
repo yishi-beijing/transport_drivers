@@ -14,12 +14,12 @@
 # Co-developed by Tier IV, Inc. and Apex.AI, Inc.
 # Maintained by LeoDrive, 2021
 
-cmake_minimum_required(VERSION 3.14.4)
+cmake_minimum_required(VERSION 3.5)
 project(boost_io_context)
 
-# Default to C++17
+# Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD 14)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")

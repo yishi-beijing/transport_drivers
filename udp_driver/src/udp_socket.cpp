@@ -16,16 +16,14 @@
 
 #include "boost_udp_driver/udp_socket.hpp"
 
-#include <rclcpp/logging.hpp>
-
-#include <boost/asio.hpp>
-#include <boost/system/system_error.hpp>
-
 #include <iostream>
+#include <utility>
 #include <string>
 #include <system_error>
-#include <utility>
 #include <vector>
+
+#include "boost/asio.hpp"
+#include "rclcpp/logging.hpp"
 
 namespace drivers
 {
@@ -263,19 +261,6 @@ void UdpSocket::bind()
 void UdpSocket::setMulticast(bool value)
 {
   m_use_multicast = value;
-}
-
-bool UdpSocket::setKernelBufferSize(int32_t n_bytes) {
-  boost::asio::socket_base::receive_buffer_size buffer_size_option{ n_bytes };
-
-  try {
-    m_udp_socket.set_option(buffer_size_option);
-  } catch (boost::system::system_error & error) {
-    RCLCPP_ERROR_STREAM(rclcpp::get_logger("UdpSocket::setkernelBufferSize"), error.what());
-    return false;
-  }
-
-  return true;
 }
 
 }  // namespace udp_driver

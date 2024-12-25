@@ -17,12 +17,12 @@
 #ifndef UDP_DRIVER__UDP_SOCKET_HPP_
 #define UDP_DRIVER__UDP_SOCKET_HPP_
 
-#include "boost_io_context/io_context.hpp"
-
-#include <cstddef>
-#include <cstdint>
+#include <array>
 #include <string>
 #include <vector>
+
+#include "boost_io_context/io_context.hpp"
+#include "boost_msg_converters/converters.hpp"
 
 namespace drivers
 {
@@ -66,16 +66,6 @@ public:
   bool isOpen() const;
   void bind();
   void setMulticast(bool value);
-
-  /**
-   * @brief Set the socket's internal receive buffer size to `n_bytes`. See `SO_RCVBUF` in `man 7
-   * socket` for more information.
-   *
-   * @param n_bytes The number of bytes to allocate.
-   * @return true If the buffer has been resized successfully.
-   * @return false If there was an error, such as the `net.core.rmem_max` value being exceeded.
-   */
-  bool setKernelBufferSize(int32_t n_bytes);
 
   /*
    * Blocking Send Operation
